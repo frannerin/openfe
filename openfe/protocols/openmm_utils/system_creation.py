@@ -201,7 +201,7 @@ def get_omm_modeller(
         # see openmm issue #4103
         if solvent_comp is not None:
             for r in system_modeller.topology.residues():
-                if r.name == 'HOH':
+                if r.name == solvent_settings.xtal_water_residues:
                     r.name = 'WAT'
 
     # Now loop through small mols
@@ -214,13 +214,18 @@ def get_omm_modeller(
         pos = solvent_comp.positive_ion
         neg = solvent_comp.negative_ion
 
+        solvent_kwargs = {"model": solvent_settings.solvent_model}
+        if protein_comp is not None and solvent_settings.boxSize is not None:
+            solvent_kwargs["boxSize"] = solvent_settings.boxSize
+        else:
+            solvent_kwargs["padding"] = to_openmm(solvent_settings.solvent_padding)
+        
         system_modeller.addSolvent(
             omm_forcefield,
-            model=solvent_settings.solvent_model,
-            padding=to_openmm(solvent_settings.solvent_padding),
             positiveIon=pos, negativeIon=neg,
             ionicStrength=to_openmm(conc),
             neutralize=solvent_comp.neutralize,
+            **solvent_kwargs
         )
 
         all_resids = np.array(

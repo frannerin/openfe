@@ -51,6 +51,15 @@ class OpenMMSolvationSettings(BaseSolvationSettings):
 
     solvent_padding: FloatQuantity['nanometer'] = 1.2 * unit.nanometer
     """Minimum distance from any solute atoms to the solvent box edge."""
+    
+    boxSize: Optional[tuple] = None
+    """Size of the cubic/orthorombic box to solvate."""
+
+    xtal_water_residues: Optional[str] = "HOH"
+    """
+    Residue name of the (crystal) water molecules present in the protein
+    structure/component.
+    """
 
     @validator('solvent_padding')
     def is_positive_distance(cls, v):
